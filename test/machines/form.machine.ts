@@ -59,7 +59,7 @@ const condFieldName = (name: string): any => (_: any, e: any) => e.fieldName ===
 const condIsEnabled = (name: string): any => (_: any, e: any, m: any) =>
   e.fieldName === name && m.state.matches(`form.${name}.enable.enabled`);
 
-const textField = (name: string) => ({
+const text = (name: string) => ({
   id: name,
   type: 'parallel',
   states: {
@@ -119,35 +119,39 @@ const textField = (name: string) => ({
 });
 
 // todo : default values for context, could we just use withContext? do we want to expose that?
-export const buildMachine = (): any => ({
-  id: 'formMachine',
+export const fields = {
+  username: text('username'), // text input
+  password: text('password'),
+};
+
+export const initialValues = {
+  username: 'jaetask', // should be this on reset.
+};
+
+/**
+ * Composable forms:
+ * ----------------
+ *
+ * maybe the form fields are a substate of the machine anyway, forms are always either, idling,
+ * resetting, submitting or submitted.
+ *
+ * And each one of the form 'states' will be a function returning an object, users can then
+ * decide if/how they want to override core usage. This allows for the most flexibility. We give guidelines
+ * but they can be ignored if required
+ *
+ * If someone needs to perform calculations, then this would be on an event or something changes,
+ * so they can do this using chained actions.
+ */
+const form = (fields: any = {}, initialValues: any = {}): any => ({
+  id: 'xstateForm',
   initial: 'form',
   context: {
-    initialValues: {
-      username: 'jaetask', // should be this on reset.
-    },
+    initialValues,
     touched: {},
     errors: {},
-    values: {
-      username: 'jaetask',
-    },
+    values: {},
     schema: undefined,
   },
-
-  /**
-   * Composable forms:
-   * ----------------
-   *
-   * maybe the form fields are a substate of the machine anyway, forms are always either, idling,
-   * resetting, submitting or submitted.
-   *
-   * And each one of the form 'states' will be a function returning an object, users can then
-   * decide if/how they want to override core usage. This allows for the most flexibility. We give guidelines
-   * but they can be ignored if required
-   *
-   * If someone needs to perform calculations, then this would be on an event or something changes,
-   * so they can do this using chained actions.
-   */
   states: {
     // this is the object they would pass in to our formBuilder function, ⬆ would be internal
     // each form element is a parallel state,
@@ -156,13 +160,14 @@ export const buildMachine = (): any => ({
     // can fields be grouped? i.e. radios?
     form: {
       type: 'parallel',
-      states: {
-        username: textField('username'),
-        password: textField('password'),
-      },
+      states: fields,
     },
     resetting: {},
     submitting: {},
     submitted: {},
   },
 });
+
+export const buildMachine = (): any => {
+  return form(fields, initialValues);
+};
