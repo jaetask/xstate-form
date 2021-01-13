@@ -26,4 +26,4 @@ This approach should keep the API light, clean and easy to use.
 
 ## Typescript
 
-This is my first typescript project, please ignore the `any` params at the mooment, especially during rapid prototyping, the API will get stricter over time, promise 😂.
+This is my first typescript project, please ignore the `any` params at the moment, especially during rapid prototyping, the API will get stricter over time, promise 😂.
