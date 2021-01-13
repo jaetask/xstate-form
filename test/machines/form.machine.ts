@@ -47,7 +47,7 @@ const condFieldName = (name: string): any => (_: any, e: any) =>
   e.fieldName === name;
 
 const condIsEnabled = (name: string): any => (_: any, e: any, m: any) =>
-  e.fieldName === name && m.state.matches(`${name}.enabled.enabled`);
+  e.fieldName === name && m.state.matches(`${name}.enable.enabled`);
 
 const textField = (name: string) => ({
   type: 'parallel',
