@@ -87,6 +87,12 @@ const textField = (name: string) => ({
           },
         },
       },
+      on: {
+        RESET: {
+          target: 'focus.unfocused',
+          actions: [resetValue(name), untouch(name)],
+        },
+      },
     },
     enable: {
       initial: 'enabled',
@@ -96,11 +102,6 @@ const textField = (name: string) => ({
             DISABLE: {
               target: ['disabled', `#${name}.focus.unfocused`],
               cond: condFieldName(name),
-            },
-            RESET: {
-              internal: true,
-              target: `#${name}.focus.unfocused`,
-              actions: [resetValue(name), untouch(name)],
             },
           },
         },
