@@ -2,7 +2,9 @@
 
 ## Reason
 
-Multiple attempts to get `xstate` and `Formik` to play nicely have resulted in a roll your own scenario. There are things I really like about Formik, it's Yup integration, FieldError, Validation and the likes. There are things I really dislike about Formik such as complex field dependant calculations are hard to implement, the black box approach hides logic and it's hard to know what changed and when.
+Multiple attempts to get `xstate` and `Formik` to play nicely have resulted in a roll your own scenario. There are things I really like about `Formik`, it's naming convention, states like isDirty, it's Yup integration, FieldError, Validation and the likes. And wherever possible I will aim to keep a similar naming convention so that concepts flow from Formik.
+
+Formik works well in many scenarios but there are things I really dislike such as it's hard to know what changed and when, complex field dependant calculations are hard to implement and the black box approach makes it difficult to hook in to inner _events_.
 
 This is where `xstate` comes in.
 
