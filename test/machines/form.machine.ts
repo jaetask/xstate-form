@@ -6,11 +6,40 @@ import { assign } from 'xstate';
 // greater flexibility, and composable forms. If they really need something custom,
 // they could always just hand code a field exactly how they want.
 
-const assignValue = (name: string): any =>
+const value = (name: string): any =>
   assign({
     values: ({ values }: any, e: any) => {
       values[name] = e.value;
       return values;
+    },
+  });
+
+const removeValue = (name: string): any =>
+  assign({
+    values: ({ values }: any) => {
+      if (values[name]) {
+        // todo: set back to default value (if there is one)...
+        delete values[name];
+      }
+      return values;
+    },
+  });
+
+const touch = (name: string): any =>
+  assign({
+    touched: ({ touched }: any) => {
+      touched[name] = true;
+      return touched;
+    },
+  });
+
+const untouch = (name: string): any =>
+  assign({
+    touched: ({ touched }: any) => {
+      if (touched[name]) {
+        delete touched[name];
+      }
+      return touched;
     },
   });
 
@@ -33,8 +62,13 @@ const textField = (name: string) => ({
               cond: condFieldName(name),
             },
             CHANGE: {
-              actions: assignValue(name),
+              actions: [value(name), touch(name)],
               cond: condIsEnabled(name),
+            },
+            RESET: {
+              internal: true,
+              target: 'focused',
+              actions: [removeValue(name), untouch(name)],
             },
           },
         },
@@ -44,11 +78,16 @@ const textField = (name: string) => ({
               target: 'focused',
               cond: condIsEnabled(name),
             },
+            RESET: {
+              internal: true,
+              target: 'focused',
+              actions: [removeValue(name), untouch(name)],
+            },
           },
         },
       },
     },
-    enabled: {
+    enable: {
       initial: 'enabled',
       states: {
         enabled: {
@@ -112,7 +151,7 @@ export const buildMachine = (): any => ({
    */
   states: {
     // this is the object they would pass in to our formBuilder function, ⬆ would be internal
-    // each form eleemnt is a parallel state,
+    // each form element is a parallel state,
     // todo: does this support nesting?
     // tabbed forms etc?
     // can fields be grouped? i.e. radios?

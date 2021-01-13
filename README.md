@@ -13,3 +13,13 @@ Most importantly, this is going to be a `functional` solution, it will work inde
 Forms driven by `xstate` can be single form or multi tab wizards, it's down to you to design your state machine to allow that.
 
 So, here goes.
+
+## 80/20 Rule
+
+> There are probably as many forms as programmers
+
+The desire is to keep the API as clean as possible, so we will always use the 80/20 rule when deciding on features. If a request fits 80% of usecases then it will be considered.
+
+The API is a set of composable functions to help you build an `xstate` machine to handle forms. The idea is to take what you need and leave the rest, if you need an unsupported feature, feel free to copy/modify one of ours and roll your own for that specific scenario.
+
+This approach should keep the API light, clean and easy to use.
