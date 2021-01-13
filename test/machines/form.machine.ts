@@ -67,7 +67,7 @@ const textField = (name: string) => ({
             },
             RESET: {
               internal: true,
-              target: 'focused',
+              target: 'unfocused',
               actions: [removeValue(name), untouch(name)],
             },
           },
@@ -80,7 +80,7 @@ const textField = (name: string) => ({
             },
             RESET: {
               internal: true,
-              target: 'focused',
+              target: 'unfocused',
               actions: [removeValue(name), untouch(name)],
             },
           },
@@ -119,7 +119,7 @@ export const buildMachine = (): any => ({
     touched: {},
     errors: {},
     values: {
-      def: 9000, // todo: check writing to nested ovjects retains values.
+      def: 9000,
       someValue: 10000,
       username: 'jaetask',
     },
@@ -127,10 +127,16 @@ export const buildMachine = (): any => ({
   },
 
   /**
-   * maybe the form fields are a substate of the machine anyway,
-   * forms are always either, idling, resetting, submitting or submitted.
+   * Composable forms:
+   * ----------------
    *
-   * maybe it should be like this
+   * maybe the form fields are a substate of the machine anyway, forms are always either, idling,
+   * resetting, submitting or submitted.
+   *
+   * And each one of the form 'states' will be a function returning an object, users can then
+   * decide if/how they want to override core usage. This allows for the most flexibility. We give guidelines
+   * but they can be ignored if required
+   *
    * states: {
    *   idle: {
    *      type: 'parallel',
@@ -140,9 +146,12 @@ export const buildMachine = (): any => ({
    *        ...
    *      },
    *   },
-   *   resetting: {},
-   *   submitting: {}
-   *   submitted: {} // could allow transition back to idle, or even a reset? depends on scenario/user
+   *
+   *   resetting: resetting(),
+   *
+   *   submitting: submitting() || submittingAsync()  // user could then invoke as async service if required.
+   *
+   *   submitted: submitted() // could allow transition back to idle, or even a reset? depends on scenario/user
    * }
    *
    *

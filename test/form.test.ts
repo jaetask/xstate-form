@@ -80,54 +80,6 @@ import { buildMachine } from './machines/form.machine';
 //   return { state, send: service.send, service, validator };
 // };
 
-// describe.skip('form', () => {
-//   it('can exist', () => {
-//     const machine = {
-//       id: 'toggle',
-//       initial: 'idle',
-//       context: {
-//         query: '',
-//       },
-//       states: {
-//         idle: {
-//           on: {
-//             FORM_QUERY: {
-//               actions: assign({ query: (_c: any, e: any): any => e.value }),
-//             },
-//           },
-//         },
-//       },
-//     };
-
-//     // i would like the validator to be passed out here,
-//     // but also updated on every state change, so that validator.hasError() can be called
-//     // and be truthful to the state
-//     // the thing is.. touched/errors etc ARE states,
-//     // should they be a machine?
-//     const { send, service, validator } = form(machine, {}, schema);
-
-//     service.onTransition((current: any) => {
-//       if (current.changed) {
-//         // console.log(current);
-//         console.log('validator', validator.errors);
-//       }
-//     });
-
-//     send('FORM_QUERY', { value: '1' }); // nothing happens
-
-//     // now touch the item
-//     validator.touch('query');
-//     send('FORM_QUERY', { value: '3' });
-//     console.log('validator', validator);
-
-//     // there's some conflict here between a programmatic interface and
-//     // a MSG based interface.
-//     // Could all of this be represented by a machine?
-//     // could the actual form just send messages to the form machine?
-//     // is there a generic way to do this?
-//   });
-// });
-
 const focus = (name: string) => ({ type: 'FOCUS', fieldName: name });
 const blur = (name: string) => ({ type: 'BLUR', fieldName: name });
 const disable = (name: string) => ({ type: 'DISABLE', fieldName: name });
@@ -202,45 +154,10 @@ describe('xstate-form', () => {
     const machineConfig = buildMachine();
     const machine = Machine(machineConfig);
     let result = transitions(machine, [focus('username')], machine.initialState);
-    expect(result.value.username.focus).toEqual('focused');
+    expect(result.matches('username.focus.focused')).toBeTruthy();
     result = transitions(machine, [disable('username')], result);
-    expect(result.value.username.focus).toEqual('unfocused');
+    expect(result.matches('username.focus.unfocused')).toBeTruthy();
   });
 
-  // it.skip('does stuff', () => {
-  //   const machineConfig = buildMachine();
-  //   // console.log('username', machine.states.username);
-  //   // console.log('password', machine.states.password);
-
-  //   const machine = Machine(machineConfig);
-  //   const service = interpret(machine);
-
-  //   service.start();
-  //   const send = service.send;
-
-  //   service.onTransition((current: any) => {
-  //     console.log(current.event.type);
-  //     console.log(current.value);
-  //     console.log(current.context);
-  //     if (
-  //       current.event.type === 'CHANGE' &&
-  //       current.history.event.type === 'DISABLE'
-  //     ) {
-  //       //expect(current.context.values.username).toEqual('123');
-  //     }
-  //   });
-
-  //   // lets focus and send some values to the username filed
-  //   send('FOCUS', { fieldName: 'username' });
-  //   send('CHANGE', { fieldName: 'username', value: '123' });
-
-  //   // disable the field and send update
-  //   send('DISABLE', { fieldName: 'username' });
-  //   send('CHANGE', { fieldName: 'username', value: 'shouldnotbeset' });
-  //   send('ENABLE', { fieldName: 'username' });
-  //   send('CHANGE', { fieldName: 'username', value: 'shouldbeset' });
-
-  //   // send('RESET');
-  //   send('SUBMIT');
-  // });
+  // RESETs happen at the field level, each field can react however it wants.
 });
