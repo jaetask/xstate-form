@@ -3,11 +3,12 @@ import { Machine } from 'xstate';
 import { buildMachine } from './machines/form.machine';
 
 // define action creators
-const focus = (name: string) => ({ type: 'FOCUS', fieldName: name });
 const blur = (name: string) => ({ type: 'BLUR', fieldName: name });
+const change = (name: string, value: string | number | boolean) => ({ type: 'CHANGE', fieldName: name, value });
 const disable = (name: string) => ({ type: 'DISABLE', fieldName: name });
 const enable = (name: string) => ({ type: 'ENABLE', fieldName: name });
-const change = (name: string, value: string | number | boolean) => ({ type: 'CHANGE', fieldName: name, value });
+const focus = (name: string) => ({ type: 'FOCUS', fieldName: name });
+const reset = () => ({ type: 'RESET' });
 
 // test utils
 const transitions = (machine: any, events: any[], initialState: any) =>
@@ -26,8 +27,6 @@ describe('xstate-form', () => {
     const machineConfig = buildMachine();
     const machine = Machine(machineConfig);
     const result = transitions(machine, [focus('username'), change('username', '3333')], machine.initialState);
-    console.log('result.value', result.value);
-
     expect(result.context.values.username).toEqual('3333');
   });
 
@@ -85,7 +84,15 @@ describe('xstate-form', () => {
     expect(result.matches('form.username.focus.unfocused')).toBeTruthy();
   });
 
-  // RESETs happen at the field level, each field can react however it wants.
+  it('textField defaults to initial value on reset', () => {
+    const machineConfig = buildMachine();
+    const machine = Machine(machineConfig);
+    const value = '0504094';
+    let result = transitions(machine, [focus('username'), change('username', value)], machine.initialState);
+    expect(result.context.values.username).toEqual(value);
+    result = transitions(machine, [reset()], result);
+    expect(result.context.values.username).toEqual(machineConfig.context.initialValues.username);
+  });
 });
 
 // scratch pad - all in one file

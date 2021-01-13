@@ -14,14 +14,25 @@ const value = (name: string): any =>
     },
   });
 
-const removeValue = (name: string): any =>
+// const removeValue = (name: string): any =>
+//   assign({
+//     values: ({ values }: any) => {
+//       if (values[name]) {
+//         // todo: set back to default value (if there is one)...
+//         delete values[name];
+//       }
+//       return values;
+//     },
+//   });
+
+const resetValue = (name: string): any =>
   assign({
-    values: ({ values }: any) => {
-      if (values[name]) {
+    values: (context: any) => {
+      if (context.values[name]) {
         // todo: set back to default value (if there is one)...
-        delete values[name];
+        context.values[name] = context?.initialValues[name] || undefined;
       }
-      return values;
+      return context.values;
     },
   });
 
@@ -65,11 +76,6 @@ const textField = (name: string) => ({
               actions: [value(name), touch(name)],
               cond: condIsEnabled(name),
             },
-            RESET: {
-              internal: true,
-              target: 'unfocused',
-              actions: [removeValue(name), untouch(name)],
-            },
           },
         },
         unfocused: {
@@ -77,11 +83,6 @@ const textField = (name: string) => ({
             FOCUS: {
               target: 'focused',
               cond: condIsEnabled(name),
-            },
-            RESET: {
-              internal: true,
-              target: 'unfocused',
-              actions: [removeValue(name), untouch(name)],
             },
           },
         },
@@ -95,6 +96,11 @@ const textField = (name: string) => ({
             DISABLE: {
               target: ['disabled', `#${name}.focus.unfocused`],
               cond: condFieldName(name),
+            },
+            RESET: {
+              internal: true,
+              target: `#${name}.focus.unfocused`,
+              actions: [resetValue(name), untouch(name)],
             },
           },
         },
@@ -116,11 +122,12 @@ export const buildMachine = (): any => ({
   id: 'formMachine',
   initial: 'form',
   context: {
+    initialValues: {
+      username: 'jaetask', // should be this on reset.
+    },
     touched: {},
     errors: {},
     values: {
-      def: 9000,
-      someValue: 10000,
       username: 'jaetask',
     },
     schema: undefined,
@@ -136,24 +143,6 @@ export const buildMachine = (): any => ({
    * And each one of the form 'states' will be a function returning an object, users can then
    * decide if/how they want to override core usage. This allows for the most flexibility. We give guidelines
    * but they can be ignored if required
-   *
-   * states: {
-   *   idle: {
-   *      type: 'parallel',
-   *      states: {
-   *        username: textField('username'),
-   *        password: textField('password'),
-   *        ...
-   *      },
-   *   },
-   *
-   *   resetting: resetting(),
-   *
-   *   submitting: submitting() || submittingAsync()  // user could then invoke as async service if required.
-   *
-   *   submitted: submitted() // could allow transition back to idle, or even a reset? depends on scenario/user
-   * }
-   *
    *
    * If someone needs to perform calculations, then this would be on an event or something changes,
    * so they can do this using chained actions.
