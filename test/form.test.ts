@@ -102,6 +102,8 @@ describe('xstate-form', () => {
     const machineConfig = buildMachine();
     const machine = Machine(machineConfig);
     const result = transitions(machine, [focus('username'), change('username', '3333')], machine.initialState);
+    console.log('result.value', result.value);
+
     expect(result.context.values.username).toEqual('3333');
   });
 
@@ -154,9 +156,9 @@ describe('xstate-form', () => {
     const machineConfig = buildMachine();
     const machine = Machine(machineConfig);
     let result = transitions(machine, [focus('username')], machine.initialState);
-    expect(result.matches('username.focus.focused')).toBeTruthy();
+    expect(result.matches('form.username.focus.focused')).toBeTruthy();
     result = transitions(machine, [disable('username')], result);
-    expect(result.matches('username.focus.unfocused')).toBeTruthy();
+    expect(result.matches('form.username.focus.unfocused')).toBeTruthy();
   });
 
   // RESETs happen at the field level, each field can react however it wants.

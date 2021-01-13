@@ -46,7 +46,7 @@ const untouch = (name: string): any =>
 const condFieldName = (name: string): any => (_: any, e: any) => e.fieldName === name;
 
 const condIsEnabled = (name: string): any => (_: any, e: any, m: any) =>
-  e.fieldName === name && m.state.matches(`${name}.enable.enabled`);
+  e.fieldName === name && m.state.matches(`form.${name}.enable.enabled`);
 
 const textField = (name: string) => ({
   id: name,
@@ -114,7 +114,7 @@ const textField = (name: string) => ({
 // todo : default values for context, could we just use withContext? do we want to expose that?
 export const buildMachine = (): any => ({
   id: 'formMachine',
-  type: 'parallel',
+  initial: 'form',
   context: {
     touched: {},
     errors: {},
@@ -164,7 +164,15 @@ export const buildMachine = (): any => ({
     // todo: does this support nesting?
     // tabbed forms etc?
     // can fields be grouped? i.e. radios?
-    username: textField('username'),
-    password: textField('password'),
+    form: {
+      type: 'parallel',
+      states: {
+        username: textField('username'),
+        password: textField('password'),
+      },
+    },
+    resetting: {},
+    submitting: {},
+    submitted: {},
   },
 });
