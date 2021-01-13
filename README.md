@@ -23,3 +23,7 @@ The desire is to keep the API as clean as possible, so we will always use the 80
 The API is a set of composable functions to help you build an `xstate` machine to handle forms. The idea is to take what you need and leave the rest, if you need an unsupported feature, feel free to copy/modify one of ours and roll your own for that specific scenario.
 
 This approach should keep the API light, clean and easy to use.
+
+## Typescript
+
+This is my first typescript project, please ignore the `any` params at the mooment, especially during rapid prototyping, the API will get stricter over time, promise 😂.
