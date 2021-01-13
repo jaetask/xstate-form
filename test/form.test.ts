@@ -130,34 +130,39 @@ import { buildMachine } from './machines/form.machine';
 
 const focus = (name: string) => ({ type: 'FOCUS', fieldName: name });
 const blur = (name: string) => ({ type: 'BLUR', fieldName: name });
-const change = (name: string, value: string) => ({ type: 'CHANGE', fieldName: name, value });
+const disable = (name: string) => ({ type: 'DISABLE', fieldName: name });
+const enable = (name: string) => ({ type: 'ENABLE', fieldName: name });
+const change = (name: string, value: string | number | boolean) => ({ type: 'CHANGE', fieldName: name, value });
+
+const transitions = (machine: any, events: any[], initialState: any) =>
+  events.reduce((current, event) => machine.transition(current, event), initialState);
 
 describe('xstate-form', () => {
-  it('textField ignores unfocused changes', () => {
+  it('textField ignores changes when unfocused', () => {
     const machineConfig = buildMachine();
     const machine = Machine(machineConfig);
     const { username } = machineConfig.context.values;
-    const event = { type: 'CHANGE', fieldName: 'username', value: '123' };
-    const state = machine.transition(machine.initialState, event);
+    const state = machine.transition(machine.initialState, change('username', '123'));
     expect(state.context.values.username).toEqual(username);
   });
 
-  it('textField accepts focused changes', () => {
+  it('textField accepts changes when focused', () => {
     const machineConfig = buildMachine();
     const machine = Machine(machineConfig);
-    let state = machine.transition(machine.initialState, focus('username'));
-    state = machine.transition(state, change('username', '3333'));
-    expect(state.context.values.username).toEqual('3333');
+    const result = transitions(machine, [focus('username'), change('username', '3333')], machine.initialState);
+    expect(result.context.values.username).toEqual('3333');
   });
 
   it('textField ignores changes after blur', () => {
     const machineConfig = buildMachine();
     const machine = Machine(machineConfig);
     const { username } = machineConfig.context.values;
-    let state = machine.transition(machine.initialState, focus('username'));
-    state = machine.transition(state, blur('username'));
-    state = machine.transition(state, change('username', '54321'));
-    expect(state.context.values.username).toEqual(username);
+    const result = transitions(
+      machine,
+      [focus('username'), blur('username'), change('username', '999999')],
+      machine.initialState
+    );
+    expect(result.context.values.username).toEqual(username);
   });
 
   it('textField is touched on change', () => {
@@ -165,9 +170,41 @@ describe('xstate-form', () => {
     const machine = Machine(machineConfig);
     let state = machine.transition(machine.initialState, focus('username'));
     expect(state.context.touched).not.toHaveProperty('username');
-    state = machine.transition(state, change('username', '12345'));
+    state = machine.transition(state, change('username', 'uygfsduygs'));
     expect(state.context.touched).toHaveProperty('username');
     expect(state.context.touched.username).toBeTruthy();
+  });
+
+  it('textField ignores changes when disabled', () => {
+    const machineConfig = buildMachine();
+    const machine = Machine(machineConfig);
+    const { username } = machineConfig.context.values;
+    const result = transitions(
+      machine,
+      [focus('username'), disable('username'), change('username', '123')],
+      machine.initialState
+    );
+    expect(result.context.values.username).toEqual(username);
+  });
+
+  it('textField allows changes after enabled and when focused', () => {
+    const machineConfig = buildMachine();
+    const machine = Machine(machineConfig);
+    const result = transitions(
+      machine,
+      [disable('username'), enable('username'), focus('username'), change('username', '909090')],
+      machine.initialState
+    );
+    expect(result.context.values.username).toEqual('909090');
+  });
+
+  it('textField loses focus when disabled', () => {
+    const machineConfig = buildMachine();
+    const machine = Machine(machineConfig);
+    let result = transitions(machine, [focus('username')], machine.initialState);
+    expect(result.value.username.focus).toEqual('focused');
+    result = transitions(machine, [disable('username')], result);
+    expect(result.value.username.focus).toEqual('unfocused');
   });
 
   // it.skip('does stuff', () => {

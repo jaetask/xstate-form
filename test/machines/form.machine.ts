@@ -43,13 +43,13 @@ const untouch = (name: string): any =>
     },
   });
 
-const condFieldName = (name: string): any => (_: any, e: any) =>
-  e.fieldName === name;
+const condFieldName = (name: string): any => (_: any, e: any) => e.fieldName === name;
 
 const condIsEnabled = (name: string): any => (_: any, e: any, m: any) =>
   e.fieldName === name && m.state.matches(`${name}.enable.enabled`);
 
 const textField = (name: string) => ({
+  id: name,
   type: 'parallel',
   states: {
     focus: {
@@ -93,7 +93,7 @@ const textField = (name: string) => ({
         enabled: {
           on: {
             DISABLE: {
-              target: 'disabled',
+              target: ['disabled', `#${name}.focus.unfocused`],
               cond: condFieldName(name),
             },
           },
