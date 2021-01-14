@@ -15,6 +15,9 @@ const submit = (name: string) => ({
               target: 'unfocused',
               cond: condFieldName(name),
             },
+            // todo: some browsers force a button to be foxced when clicked, others do not.
+            // some also act differently depending on the OS build.
+            // possibly send a focus(name) event when clicked
             CLICK: {
               actions: [raise('SUBMIT')],
               cond: condIsEnabled(name),
