@@ -18,6 +18,10 @@ const text = (name: string) => ({
               actions: [value(name), touch(name)],
               cond: condIsEnabled(name),
             },
+            FOCUS: {
+              target: 'unfocused',
+              cond: !condFieldName(name),
+            },
           },
         },
         unfocused: {

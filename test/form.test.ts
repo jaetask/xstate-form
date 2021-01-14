@@ -86,6 +86,18 @@ describe('textField', () => {
     result = transitions(machine, [reset()], result);
     expect(result.context.values.username).toEqual(machineConfig.context.initialValues.username);
   });
+
+  it('loses focus if another filed is focused', () => {
+    const machineConfig = buildMachine();
+    const machine = Machine(machineConfig);
+    let result = transitions(machine, [focus('username')], machine.initialState);
+    expect(result.matches('form.username.focus.focused')).toBeTruthy();
+
+    // now focus another field
+    result = transitions(machine, [focus('password')], result);
+    expect(result.matches('form.username.focus.unfocused')).toBeTruthy();
+    expect(result.matches('form.password.focus.focused')).toBeTruthy();
+  });
 });
 
 describe('submit', () => {
