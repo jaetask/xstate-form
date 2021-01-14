@@ -87,7 +87,7 @@ describe('textField', () => {
     expect(result.context.values.username).toEqual(machineConfig.context.initialValues.username);
   });
 
-  it('loses focus if another filed is focused', () => {
+  it('loses focus if another field is focused', () => {
     const machineConfig = buildMachine();
     const machine = Machine(machineConfig);
     let result = transitions(machine, [focus('username')], machine.initialState);
