@@ -2,4 +2,7 @@
 *.log
 .DS_Store
 node_modules
+examples/*/node_modules
+examples/*/package-lock.json
+examples/*/yarn.lock
 dist
