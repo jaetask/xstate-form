@@ -100,8 +100,11 @@ export const form = ({
       schema: undefined,
     },
     states: {
-      // Each field is a parallel state,
       // todo: Does this support nesting? tabbed forms etc? Can fields be grouped? i.e. radios?
+      // considering all fields in a mutli page form are still in one form, we just choose to
+      // show/hide parts of the form per page.
+      //
+      // Each field is a parallel state and has it's own states enabled/focused/selected etc
       form: {
         type: 'parallel',
         states: fields,
