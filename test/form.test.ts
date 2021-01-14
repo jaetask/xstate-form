@@ -1,15 +1,7 @@
 import { Machine } from 'xstate';
 // import * as Yup from 'yup';
 import { buildMachine } from './machines/form.machine';
-
-// define action creators
-const blur = (name: string) => ({ type: 'BLUR', fieldName: name });
-const change = (name: string, value: string | number | boolean) => ({ type: 'CHANGE', fieldName: name, value });
-const disable = (name: string) => ({ type: 'DISABLE', fieldName: name });
-const enable = (name: string) => ({ type: 'ENABLE', fieldName: name });
-const focus = (name: string) => ({ type: 'FOCUS', fieldName: name });
-const reset = () => ({ type: 'RESET' });
-const click = (name: string) => ({ type: 'CLICK', fieldName: name });
+import { blur, change, click, disable, enable, focus, reset } from '../src/actions';
 
 // test utils
 const transitions = (machine: any, events: any[], initialState: any) =>
