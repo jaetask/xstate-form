@@ -9,13 +9,14 @@ const disable = (name: string) => ({ type: 'DISABLE', fieldName: name });
 const enable = (name: string) => ({ type: 'ENABLE', fieldName: name });
 const focus = (name: string) => ({ type: 'FOCUS', fieldName: name });
 const reset = () => ({ type: 'RESET' });
+const click = (name: string) => ({ type: 'CLICK', fieldName: name });
 
 // test utils
 const transitions = (machine: any, events: any[], initialState: any) =>
   events.reduce((current, event) => machine.transition(current, event), initialState);
 
-describe('xstate-form', () => {
-  it('textField ignores changes when unfocused', () => {
+describe('textField', () => {
+  it('ignores changes when unfocused', () => {
     const machineConfig = buildMachine();
     const machine = Machine(machineConfig);
     const { username } = machineConfig.context.values;
@@ -23,14 +24,14 @@ describe('xstate-form', () => {
     expect(state.context.values.username).toEqual(username);
   });
 
-  it('textField accepts changes when focused', () => {
+  it('accepts changes when focused', () => {
     const machineConfig = buildMachine();
     const machine = Machine(machineConfig);
     const result = transitions(machine, [focus('username'), change('username', '3333')], machine.initialState);
     expect(result.context.values.username).toEqual('3333');
   });
 
-  it('textField ignores changes after blur', () => {
+  it('ignores changes after blur', () => {
     const machineConfig = buildMachine();
     const machine = Machine(machineConfig);
     const { username } = machineConfig.context.values;
@@ -42,7 +43,7 @@ describe('xstate-form', () => {
     expect(result.context.values.username).toEqual(username);
   });
 
-  it('textField is touched on change', () => {
+  it('is touched on change', () => {
     const machineConfig = buildMachine();
     const machine = Machine(machineConfig);
     let state = machine.transition(machine.initialState, focus('username'));
@@ -52,7 +53,7 @@ describe('xstate-form', () => {
     expect(state.context.touched.username).toBeTruthy();
   });
 
-  it('textField ignores changes when disabled', () => {
+  it('ignores changes when disabled', () => {
     const machineConfig = buildMachine();
     const machine = Machine(machineConfig);
     const { username } = machineConfig.context.values;
@@ -64,7 +65,7 @@ describe('xstate-form', () => {
     expect(result.context.values.username).toEqual(username);
   });
 
-  it('textField allows changes after enabled and when focused', () => {
+  it('allows changes after enabled and when focused', () => {
     const machineConfig = buildMachine();
     const machine = Machine(machineConfig);
     const result = transitions(
@@ -75,7 +76,7 @@ describe('xstate-form', () => {
     expect(result.context.values.username).toEqual('909090');
   });
 
-  it('textField loses focus when disabled', () => {
+  it('loses focus when disabled', () => {
     const machineConfig = buildMachine();
     const machine = Machine(machineConfig);
     let result = transitions(machine, [focus('username')], machine.initialState);
@@ -84,7 +85,7 @@ describe('xstate-form', () => {
     expect(result.matches('form.username.focus.unfocused')).toBeTruthy();
   });
 
-  it('textField defaults to initial value on reset', () => {
+  it('defaults to initial value on reset', () => {
     const machineConfig = buildMachine();
     const machine = Machine(machineConfig);
     const value = '0504094';
@@ -92,6 +93,31 @@ describe('xstate-form', () => {
     expect(result.context.values.username).toEqual(value);
     result = transitions(machine, [reset()], result);
     expect(result.context.values.username).toEqual(machineConfig.context.initialValues.username);
+  });
+});
+
+describe('submit', () => {
+  it('raises SUBMIT on click', () => {
+    const machineConfig = buildMachine();
+    const machine = Machine(machineConfig);
+    let result = transitions(machine, [focus('submitForm'), click('submitForm')], machine.initialState);
+    expect(result.matches('submitting')).toBeTruthy();
+  });
+  it('ignores click when unfocused', () => {
+    const machineConfig = buildMachine();
+    const machine = Machine(machineConfig);
+    let result = transitions(machine, [click('submitForm')], machine.initialState);
+    expect(result.matches('form')).toBeTruthy();
+  });
+  it('ignores click when disabled', () => {
+    const machineConfig = buildMachine();
+    const machine = Machine(machineConfig);
+    let result = transitions(
+      machine,
+      [focus('submitForm'), disable('submitForm'), click('submitForm')],
+      machine.initialState
+    );
+    expect(result.matches('form')).toBeTruthy();
   });
 });
 
