@@ -96,7 +96,7 @@ export const form = ({
       initialValues,
       touched: {},
       errors: {},
-      values: {},
+      values: { ...initialValues },
       schema: undefined,
     },
     states: {

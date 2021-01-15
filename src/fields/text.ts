@@ -1,4 +1,4 @@
-import { condFieldName, condIsEnabled } from '../conditions';
+import { condFieldName, condIsEnabled, condIsVisible, conditionsAll } from '../conditions';
 import { resetValue, touch, value, untouch } from '../form';
 
 const text = (name: string) => ({
@@ -16,7 +16,7 @@ const text = (name: string) => ({
             },
             CHANGE: {
               actions: [value(name), touch(name)],
-              cond: condIsEnabled(name),
+              cond: conditionsAll([condFieldName(name), condIsEnabled(name)]),
             },
             FOCUS: {
               target: 'unfocused',
@@ -28,7 +28,7 @@ const text = (name: string) => ({
           on: {
             FOCUS: {
               target: 'focused',
-              cond: condIsEnabled(name),
+              cond: conditionsAll([condFieldName(name), condIsEnabled(name), condIsVisible(name)]),
             },
           },
         },
