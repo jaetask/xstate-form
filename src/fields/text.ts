@@ -1,4 +1,4 @@
-import { condFieldName, condIsEnabled, condIsVisible, conditionsAll } from '../conditions';
+import { condFieldName, condIsEnabled, condIsVisible, condIsTouched, conditionsAll } from '../conditions';
 import { resetValue, touch, value, untouch } from '../form';
 
 const text = (name: string) => ({
@@ -79,6 +79,33 @@ const text = (name: string) => ({
               cond: condFieldName(name),
             },
           },
+        },
+      },
+    },
+    valid: {
+      initial: 'valid',
+      states: {
+        valid: {
+          on: {
+            INVALID: {
+              target: 'invalid',
+              cond: conditionsAll([condFieldName(name), condIsTouched(name)]),
+            },
+          },
+        },
+        invalid: {
+          on: {
+            VALID: {
+              target: 'valid',
+              cond: condFieldName(name),
+            },
+          },
+        },
+      },
+      on: {
+        RESET: {
+          target: 'valid.valid',
+          actions: [],
         },
       },
     },
