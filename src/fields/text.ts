@@ -61,6 +61,27 @@ const text = (name: string) => ({
         },
       },
     },
+    visible: {
+      initial: 'visible',
+      states: {
+        visible: {
+          on: {
+            INVISIBLE: {
+              target: ['invisible', `#${name}.focus.unfocused`],
+              cond: condFieldName(name),
+            },
+          },
+        },
+        invisible: {
+          on: {
+            VISIBLE: {
+              target: 'visible',
+              cond: condFieldName(name),
+            },
+          },
+        },
+      },
+    },
   },
 });
 

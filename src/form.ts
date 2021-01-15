@@ -50,7 +50,7 @@ export const untouch = (name: string): any =>
 
 export const resettingState = () => ({
   after: {
-    250: 'form',
+    250: 'form.hist',
   },
 });
 
@@ -64,7 +64,7 @@ export const submittingState = () => ({
 // some may want a single submit, some may want RETRY capability..
 export const submittedState = () => ({
   after: {
-    2500: 'form',
+    2500: 'form.hist',
   },
 });
 
@@ -107,7 +107,13 @@ export const form = ({
       // Each field is a parallel state and has it's own states enabled/focused/selected etc
       form: {
         type: 'parallel',
-        states: fields,
+        states: {
+          hist: {
+            type: 'history',
+            history: 'deep',
+          },
+          ...fields,
+        },
         on: {
           SUBMIT: 'submitting',
           RESET: 'resetting',

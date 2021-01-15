@@ -5,3 +5,5 @@ export const enable = (name: string) => ({ type: 'ENABLE', fieldName: name });
 export const focus = (name: string) => ({ type: 'FOCUS', fieldName: name });
 export const reset = () => ({ type: 'RESET' });
 export const click = (name: string) => ({ type: 'CLICK', fieldName: name });
+export const visible = (name: string) => ({ type: 'VISIBLE', fieldName: name });
+export const invisible = (name: string) => ({ type: 'INVISIBLE', fieldName: name });
