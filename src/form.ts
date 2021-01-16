@@ -48,6 +48,21 @@ export const untouch = (name: string): any =>
     },
   });
 
+export const validate = (name: string) =>
+  assign({
+    errors: (c: any, e: any, m: any) => {
+      // if we have a validate function, call it and we're good to go
+      console.log('inside validate->assign->errors', name);
+
+      if (typeof c?.validate === 'function') {
+        const errors = c.validate(c.values, e, m, name);
+        console.log('errors', errors);
+        return errors;
+      }
+      return {};
+    },
+  });
+
 export const resettingState = () => ({
   after: {
     250: 'form.hist',
@@ -88,6 +103,7 @@ export const form = ({
   resetting = resettingState(),
   submitting = submittingState(),
   submitted = submittedState(),
+  validate = undefined,
 }): any => {
   return {
     id: 'xstateForm',
@@ -97,7 +113,7 @@ export const form = ({
       touched: {},
       errors: {},
       values: { ...initialValues },
-      schema: undefined,
+      validate,
     },
     states: {
       // todo: Does this support nesting? tabbed forms etc? Can fields be grouped? i.e. radios?
