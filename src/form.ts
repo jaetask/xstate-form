@@ -52,8 +52,6 @@ export const validate = (name: string) =>
   assign({
     errors: (c: any, e: any, m: any) => {
       // if we have a validate function, call it and we're good to go
-      console.log('inside validate->assign->errors', name);
-
       if (typeof c?.validate === 'function') {
         const errors = c.validate(c.values, e, m, name);
         console.log('errors', errors);
