@@ -80,7 +80,8 @@ const text = (name: string) => ({
 
 _note: we don't currently use the `meta.field.type` but think this is a good idea for future use, form generation, testing etc_
 
-[see ticket](https://github.com/jaetask/xstate-form/projects/1#card-52969608) for passing `meta` data to fields
+- Fields are named via `StateNode.id`, allows finding in actions
+- Ticket to allow [passing meta data](https://github.com/jaetask/xstate-form/projects/1#card-52969608) to fields
 
 ## Validation
 
