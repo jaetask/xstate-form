@@ -5,7 +5,7 @@
 This module is currently in alpha
 
 - Under continuous develoment
-- API is not guaranteed until beta
+- API is not guaranteed
 - Rapid prototyping may cause bugs, inconsistencies
 
 ## React example
