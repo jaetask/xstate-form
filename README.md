@@ -33,6 +33,51 @@ const machine = form({
 });
 ```
 
+The `machine` const is now an `xstate` compliant machine configuratin object that can be passed to `useMachine` or `interpret`. The various form fields e.g. (`form.text()`) return a state object with default event handling, actions and state transitions.
+
+Here's an example of the `text` state node.
+_simplified for berevity_
+
+```js
+const text = (name: string) => ({
+  id: name,
+  type: 'parallel',
+  states: {
+    focus: {
+      initial: 'unfocused',
+      states: {
+        focused: {
+          on: {
+            BLUR: {},
+            CHANGE: {},
+            FOCUS: {},
+          },
+        },
+        unfocused: {
+          on: {
+            FOCUS: {},
+          },
+        },
+      },
+    },
+    enable: {
+      // ...
+    },
+    visible: {
+      // ...
+    },
+    valid: {
+      // ...
+    },
+    meta: {
+      field: {
+        type: 'text',
+      },
+    },
+  },
+});
+```
+
 ## Validation
 
 Form validation works via a simple JS function, (this enables any validation library, including `Yup` to be used by the user). There is a [ticket](https://github.com/jaetask/xstate-form/projects/1#card-52968847) to add Yup integration by default via `validationSchema`
