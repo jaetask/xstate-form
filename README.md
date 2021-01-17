@@ -12,22 +12,6 @@ This module is currently in alpha
 
 This core library is in parallel development with a `React` [example repo](https://github.com/jaetask/example-forms) which also contains a `useFormMachine` hook.
 
-## Reason
-
-Multiple attempts to get `xstate` and `Formik` to play nicely have resulted in a roll your own scenario. There are things I really like about `Formik`, it's naming convention, states like isDirty, it's Yup integration, FieldError, Validation and the likes. And wherever possible I will aim to keep a similar naming convention so that concepts flow from Formik.
-
-Formik works well in many scenarios but there are things I really dislike such as it's hard to know what changed and when, complex field dependant calculations are hard to implement and the black box approach makes it difficult to hook in to inner _events_.
-
-This is where `xstate` comes in.
-
-The plan here is to create a `Formik` style `xstate` form handler, with validation, `FieldError` and the likes. I doubt it will implement _all_ of Formiks features, and I suspect there will be some _additional_ features.
-
-Most importantly, this is going to be a `functional` solution, it will work independantly of `React`, there will be a `React` handler, a `Vue` handler etc. The idea is to use `xstate` and `xstate-forms` to solve form issues independantly of your renderer.
-
-Forms driven by `xstate` can be single form or multi tab wizards, it's down to you to design your state machine to allow that.
-
-So, here goes.
-
 ## 80/20 Rule
 
 > There are probably as many forms as programmers
