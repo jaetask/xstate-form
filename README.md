@@ -17,7 +17,7 @@ This core library is in parallel development with a `React` [example repo](https
 The current create form api looks like this
 
 ```js
-const machine = form.form({
+const machine = form({
   fields: {
     username: fields.text('username'),
     password: fields.text('password'),
@@ -36,7 +36,7 @@ const machine = form.form({
 Form validation works via a simple JS function, (this enables any validation library `Yup` etc to be used by the user). There is a [ticket](https://github.com/jaetask/xstate-form/projects/1#card-52968847) to add Yup integration by default
 
 ```js
-const machine = form.form({
+const machine = form({
   // example of simple JS validation func,
   // could come from any validation library..
   validate: (values, event, meta, name) => {
