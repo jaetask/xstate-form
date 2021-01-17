@@ -109,7 +109,7 @@ const machine = form({
 });
 ```
 
-Validation works on every `CHANGE`, `FOCUS` and `BLUR` event, this is similar to other form libraries, there will also be a `VALIDATE` method to [explicitly trigger validation](https://github.com/jaetask/xstate-form/projects/1#card-52969369) yourself.
+Validation works on every `CHANGE`, `FOCUS` and `BLUR` event, this is similar to other form libraries, there will also be a `VALIDATE` method to explicitly trigger validation yourself. [see ticket](https://github.com/jaetask/xstate-form/projects/1#card-52969369)
 
 ## 80/20 Rule
 
