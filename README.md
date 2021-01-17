@@ -20,6 +20,7 @@ The current create form api looks like this
 import { form, fields } from 'xstate-form';
 
 const machine = form({
+  id: 'myAwesomeForm',
   fields: {
     username: fields.text('username'),
     password: fields.text('password'),
@@ -91,6 +92,7 @@ Form validation works via a simple JS function, (this enables any validation lib
 import { form, fields } from 'xstate-form';
 
 const machine = form({
+  id: 'myAwesomeForm',
   validate: (values, event, meta, name) => {
     const errors = {};
     if (values.username.match(/[0-9]+/g)) {
