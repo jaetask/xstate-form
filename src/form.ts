@@ -19,6 +19,9 @@ export const value = (name: string): any =>
 //     },
 //   });
 
+export const currentFocus = (name: string): any => assign({ focused: name });
+export const clearCurrentFocus = () => assign({ focused: null });
+
 export const resetValue = (name: string): any =>
   assign({
     values: (context: any) => {
@@ -53,9 +56,7 @@ export const validate = (name: string) =>
     errors: (c: any, e: any, m: any) => {
       // if we have a validate function, call it and we're good to go
       if (typeof c?.validate === 'function') {
-        const errors = c.validate(c.values, e, m, name);
-        console.log('errors', errors);
-        return errors;
+        return c.validate(c.values, e, m, name);
       }
       return {};
     },
@@ -107,11 +108,12 @@ export const form = ({
     id: 'xstateForm',
     initial: 'form',
     context: {
+      errors: {},
+      focused: null,
       initialValues,
       touched: {},
-      errors: {},
-      values: { ...initialValues },
       validate,
+      values: { ...initialValues },
     },
     states: {
       // todo: Does this support nesting? tabbed forms etc? Can fields be grouped? i.e. radios?

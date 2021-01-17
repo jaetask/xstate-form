@@ -209,4 +209,29 @@ describe('text', () => {
       expect(result.matches('form.username.valid.valid')).toBeTruthy();
     });
   });
+
+  describe('context.focused', () => {
+    it('sets value on field focused', () => {
+      const machineConfig = buildMachine();
+      const machine = Machine(machineConfig);
+      const state = machine.transition(machine.initialState, focus('username'));
+      expect(state.context.focused).toEqual('username');
+    });
+
+    it('resets value on field unfocused', () => {
+      const machineConfig = buildMachine();
+      const machine = Machine(machineConfig);
+      let result = transitions(machine, [focus('username'), blur('username')], machine.initialState);
+      expect(result.context.focused).toBeNull();
+    });
+
+    it('resets value on reset', () => {
+      const machineConfig = buildMachine();
+      const machine = Machine(machineConfig);
+      let result = transitions(machine, [focus('username')], machine.initialState);
+      expect(result.context.focused).toEqual('username');
+      result = transitions(machine, [reset()], result);
+      expect(result.context.focused).toBeNull();
+    });
+  });
 });

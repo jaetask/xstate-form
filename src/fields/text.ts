@@ -1,5 +1,5 @@
 import { condFieldName, condIsEnabled, condIsVisible, condIsTouched, conditionsAll } from '../conditions';
-import { resetValue, touch, value, untouch, validate } from '../form';
+import { resetValue, touch, value, untouch, validate, currentFocus, clearCurrentFocus } from '../form';
 
 const text = (name: string) => ({
   id: name,
@@ -12,7 +12,7 @@ const text = (name: string) => ({
           on: {
             BLUR: {
               target: 'unfocused',
-              actions: [validate(name)],
+              actions: [validate(name), clearCurrentFocus()],
               cond: condFieldName(name),
             },
             CHANGE: {
@@ -21,6 +21,7 @@ const text = (name: string) => ({
             },
             FOCUS: {
               target: 'unfocused',
+              actions: currentFocus(name),
               cond: !condFieldName(name),
             },
           },
@@ -29,6 +30,7 @@ const text = (name: string) => ({
           on: {
             FOCUS: {
               target: 'focused',
+              actions: currentFocus(name),
               cond: conditionsAll([condFieldName(name), condIsEnabled(name), condIsVisible(name)]),
             },
           },
@@ -37,7 +39,7 @@ const text = (name: string) => ({
       on: {
         RESET: {
           target: 'focus.unfocused',
-          actions: [resetValue(name), untouch(name), validate(name)],
+          actions: [resetValue(name), untouch(name), validate(name), clearCurrentFocus()],
         },
       },
     },
@@ -111,8 +113,8 @@ const text = (name: string) => ({
       },
     },
     meta: {
-      does: {
-        data: 'at this level get saved?',
+      field: {
+        type: 'text',
       },
     },
   },
