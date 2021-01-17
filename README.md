@@ -35,7 +35,7 @@ const machine = form({
 
 ## Validation
 
-Form validation works via a simple JS function, (this enables any validation library `Yup` etc to be used by the user). There is a [ticket](https://github.com/jaetask/xstate-form/projects/1#card-52968847) to add Yup integration by default
+Form validation works via a simple JS function, (this enables any validation library, including `Yup` to be used by the user). There is a [ticket](https://github.com/jaetask/xstate-form/projects/1#card-52968847) to add Yup integration by default via `validationSchema`
 
 ```js
 import { form, fields } from 'xstate-form';
