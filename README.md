@@ -33,7 +33,7 @@ const machine = form({
 });
 ```
 
-The `machine` const is now an `xstate` compliant machine configuratin object that can be passed to `useMachine` or `interpret`. The various form fields e.g. (`form.text()`) return a state object with default event handling, actions and state transitions.
+The `machine` const is now an `xstate` compliant machine configuration object that can be passed to `useMachine` or `interpret`. The various form fields e.g. (`form.text()`) return a state object with default event handling, actions and state transitions.
 
 Here's an example of the `text` state node.
 _simplified for berevity_
