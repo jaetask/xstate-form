@@ -41,8 +41,6 @@ Form validation works via a simple JS function, (this enables any validation lib
 import { form, fields } from 'xstate-form';
 
 const machine = form({
-  // example of simple JS validation func,
-  // could come from any validation library..
   validate: (values, event, meta, name) => {
     const errors = {};
     if (values.username.match(/[0-9]+/g)) {
