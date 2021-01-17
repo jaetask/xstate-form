@@ -97,6 +97,7 @@ export const submittedState = () => ({
  */
 export const form = ({
   fields = {},
+  id = 'xstateForm',
   initialValues = {},
   additionalStates = {}, // enable users to expand the states for things like RETRY!
   resetting = resettingState(),
@@ -105,7 +106,7 @@ export const form = ({
   validate = undefined,
 }): any => {
   return {
-    id: 'xstateForm',
+    id,
     initial: 'form',
     context: {
       errors: {},
