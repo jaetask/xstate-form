@@ -12,6 +12,56 @@ This module is currently in alpha
 
 This core library is in parallel development with a `React` [example repo](https://github.com/jaetask/example-forms) which also contains a `useFormMachine` hook.
 
+### API
+
+The current create form api looks like this
+
+```js
+const machine = form.form({
+  fields: {
+    username: fields.text('username'),
+    password: fields.text('password'),
+    // ...
+    submitForm: fields.submit('submitForm'),
+  },
+  initialValues: {
+    username: 'jaetask',
+    password: 'ThisIsTheWay',
+  },
+});
+```
+
+## Validation
+
+Form validation works via a simple JS function, (this enables any validation library `Yup` etc to be used by the user). There is a [ticket](https://github.com/jaetask/xstate-form/projects/1#card-52968847) to add Yup integration by default
+
+```js
+const machine = form.form({
+  // example of simple JS validation func,
+  // could come from any validation library..
+  validate: (values, event, meta, name) => {
+    const errors = {};
+    if (values.username.match(/[0-9]+/g)) {
+      errors.username = 'Username cannot include a number';
+    }
+    if (values.password.length <= 8) {
+      errors.password = 'Password must be > 8 chars';
+    }
+    return errors;
+  },
+  fields: {
+    username: fields.text('username'),
+    password: fields.text('password'),
+    // ...
+    submitForm: fields.submit('submitForm'),
+  },
+  initialValues: {
+    username: 'jaetask',
+    password: 'ThisIsTheWay',
+  },
+});
+```
+
 ## 80/20 Rule
 
 > There are probably as many forms as programmers
