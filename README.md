@@ -1,5 +1,17 @@
 # xstate-form
 
+## Alpha
+
+This module is currently in alpha
+
+- Under continuous develoment
+- API is not guaranteed until beta
+- Rapid prototyping may cause bugs, inconsistencies
+
+## React example
+
+This core library is in parallel development with a `React` [example repo](https://github.com/jaetask/example-forms) which also contains a `useFormMachine` hook.
+
 ## Reason
 
 Multiple attempts to get `xstate` and `Formik` to play nicely have resulted in a roll your own scenario. There are things I really like about `Formik`, it's naming convention, states like isDirty, it's Yup integration, FieldError, Validation and the likes. And wherever possible I will aim to keep a similar naming convention so that concepts flow from Formik.
