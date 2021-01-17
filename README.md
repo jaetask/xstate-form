@@ -78,6 +78,8 @@ const text = (name: string) => ({
 });
 ```
 
+_note: we don't currently use the `meta.field.type` but think this is a good idea for future use, form generation, testing etc_
+
 ## Validation
 
 Form validation works via a simple JS function, (this enables any validation library, including `Yup` to be used by the user). There is a [ticket](https://github.com/jaetask/xstate-form/projects/1#card-52968847) to add Yup integration by default via `validationSchema`
