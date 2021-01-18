@@ -14,11 +14,57 @@ describe('text', () => {
     it('defaults to initial value on reset', () => {
       const machineConfig = buildMachine();
       const machine = Machine(machineConfig);
+      const name = 'username';
       const value = '0504094';
-      let result = transitions(machine, [focus('username'), change('username', value)], machine.initialState);
+      let result = transitions(machine, [focus(name), change(name, value), blur(name)], machine.initialState);
       expect(result.context.values.username).toEqual(value);
       result = transitions(machine, [reset()], result);
-      expect(result.context.values.username).toEqual(machineConfig.context.initialValues.username);
+      expect(result.matches('form.username.touch.untouched')).toBeTruthy();
+    });
+  });
+
+  describe('enable', () => {
+    it('ignores changes when disabled', () => {
+      const machineConfig = buildMachine();
+      const machine = Machine(machineConfig);
+      const { username } = machineConfig.context.values;
+      const result = transitions(
+        machine,
+        [focus('username'), disable('username'), change('username', '123')],
+        machine.initialState
+      );
+      expect(result.context.values.username).toEqual(username);
+    });
+
+    it('allows changes after enabled and when focused', () => {
+      const machineConfig = buildMachine();
+      const machine = Machine(machineConfig);
+      const result = transitions(
+        machine,
+        [disable('username'), enable('username'), focus('username'), change('username', '909090')],
+        machine.initialState
+      );
+      expect(result.context.values.username).toEqual('909090');
+    });
+
+    it('ignores focus when disabled', () => {
+      const machineConfig = buildMachine();
+      const machine = Machine(machineConfig);
+      const result = transitions(
+        machine,
+        [focus('username'), disable('username'), focus('username')],
+        machine.initialState
+      );
+      expect(result.matches('form.username.focus.unfocused')).toBeTruthy();
+    });
+
+    it('loses focus when disabled', () => {
+      const machineConfig = buildMachine();
+      const machine = Machine(machineConfig);
+      let result = transitions(machine, [focus('username')], machine.initialState);
+      expect(result.matches('form.username.focus.focused')).toBeTruthy();
+      result = transitions(machine, [disable('username')], result);
+      expect(result.matches('form.username.focus.unfocused')).toBeTruthy();
     });
   });
 
@@ -62,60 +108,128 @@ describe('text', () => {
     });
   });
 
-  describe('touched', () => {
-    it('is touched on change', () => {
+  /**
+   * `pristine` is when a field has been edited
+   *    - is pristine by default
+   *    - is pristine on `FOCUS`
+   *    - is pristine on `RESET`
+   *    - is dirty on any `CHANGE`, `SELECT` etc **That is different from default value**
+   */
+  describe('pristine', () => {
+    it('is pristine by default', () => {
       const machineConfig = buildMachine();
       const machine = Machine(machineConfig);
-      let state = machine.transition(machine.initialState, focus('username'));
-      expect(state.context.touched).not.toHaveProperty('username');
-      state = machine.transition(state, change('username', 'uygfsduygs'));
-      expect(state.context.touched).toHaveProperty('username');
-      expect(state.context.touched.username).toBeTruthy();
+      let result = machine.transition(machine.initialState, focus('someUnrelatedFIeld'));
+      expect(result.matches('form.username.pristine.pristine')).toBeTruthy();
+    });
+    it('is pristine on `FOCUS`', () => {
+      const machineConfig = buildMachine();
+      const machine = Machine(machineConfig);
+      let result = machine.transition(machine.initialState, focus('username'));
+      expect(result.matches('form.username.pristine.pristine')).toBeTruthy();
+    });
+    it('is pristine on `RESET`', () => {
+      const machineConfig = buildMachine();
+      const machine = Machine(machineConfig);
+      const name = 'username';
+      let result = transitions(machine, [focus(name), change(name, '123'), reset()], machine.initialState);
+      expect(result.matches('form.username.pristine.pristine')).toBeTruthy();
+    });
+    it('is dirty on `CHANGE`', () => {
+      const machineConfig = buildMachine();
+      const machine = Machine(machineConfig);
+      const name = 'username';
+      let result = transitions(machine, [focus(name), change(name, '123')], machine.initialState);
+      expect(result.matches('form.username.pristine.dirty')).toBeTruthy();
+    });
+    // todo: is not dirty on change back/to default value
+  });
+
+  /**
+   * `touched` is when a field has had focus and been blurred
+   *   - is untouched by default
+   *   - is untouched on `RESET`
+   *   - is touched on first `BLUR`
+   */
+  describe('touch', () => {
+    it('is untouched by default', () => {
+      const machineConfig = buildMachine();
+      const machine = Machine(machineConfig);
+      let result = machine.transition(machine.initialState, focus('someUnrelatedFIeld'));
+      expect(result.matches('form.username.touch.untouched')).toBeTruthy();
+    });
+    it('is untouched on RESET', () => {
+      const machineConfig = buildMachine();
+      const machine = Machine(machineConfig);
+      const name = 'username';
+      let result = transitions(machine, [focus(name), change(name, 'rand8'), blur(name)], machine.initialState);
+      expect(result.matches('form.username.touch.touched')).toBeTruthy();
+      result = machine.transition(result, reset());
+      expect(result.matches('form.username.touch.untouched')).toBeTruthy();
+    });
+
+    it('is touched on blur (after focus)', () => {
+      const machineConfig = buildMachine();
+      const machine = Machine(machineConfig);
+      let result = machine.transition(machine.initialState, focus('username'));
+      expect(result.matches('form.username.touch.untouched')).toBeTruthy();
+      result = machine.transition(result, blur('username'));
+      expect(result.matches('form.username.touch.touched')).toBeTruthy();
+    });
+
+    it('is not touched on blur (if not previously focused)', () => {
+      const machineConfig = buildMachine();
+      const machine = Machine(machineConfig);
+      let result = machine.transition(machine.initialState, enable('username')); // just a random message that's not focus
+      expect(result.matches('form.username.touch.untouched')).toBeTruthy();
+      result = machine.transition(result, blur('username'));
+      expect(result.matches('form.username.touch.touched')).toBeTruthy();
     });
   });
 
-  describe('enabled', () => {
-    it('ignores changes when disabled', () => {
-      const machineConfig = buildMachine();
-      const machine = Machine(machineConfig);
-      const { username } = machineConfig.context.values;
-      const result = transitions(
-        machine,
-        [focus('username'), disable('username'), change('username', '123')],
-        machine.initialState
-      );
-      expect(result.context.values.username).toEqual(username);
-    });
-
-    it('allows changes after enabled and when focused', () => {
-      const machineConfig = buildMachine();
-      const machine = Machine(machineConfig);
-      const result = transitions(
-        machine,
-        [disable('username'), enable('username'), focus('username'), change('username', '909090')],
-        machine.initialState
-      );
-      expect(result.context.values.username).toEqual('909090');
-    });
-
-    it('ignores focus when disabled', () => {
-      const machineConfig = buildMachine();
-      const machine = Machine(machineConfig);
-      const result = transitions(
-        machine,
-        [focus('username'), disable('username'), focus('username')],
-        machine.initialState
-      );
-      expect(result.matches('form.username.focus.unfocused')).toBeTruthy();
-    });
-
-    it('loses focus when disabled', () => {
+  // validation is changing, skip this for now
+  describe.skip('validation', () => {
+    it('is valid by default', () => {
       const machineConfig = buildMachine();
       const machine = Machine(machineConfig);
       let result = transitions(machine, [focus('username')], machine.initialState);
-      expect(result.matches('form.username.focus.focused')).toBeTruthy();
-      result = transitions(machine, [disable('username')], result);
-      expect(result.matches('form.username.focus.unfocused')).toBeTruthy();
+      expect(result.matches('form.username.valid.valid')).toBeTruthy();
+    });
+    it('is valid when changed', () => {
+      const machineConfig = buildMachine();
+      const machine = Machine(machineConfig);
+      let result = transitions(machine, [focus('username'), change('username', '123')], machine.initialState);
+      expect(result.matches('form.username.valid.valid')).toBeTruthy();
+    });
+    it('is valid on reset', () => {
+      const machineConfig = buildMachine();
+      const machine = Machine(machineConfig);
+      let result = transitions(
+        machine,
+        [focus('username'), change('username', '123'), invalid('username')],
+        machine.initialState
+      );
+      expect(result.matches('form.username.valid.invalid')).toBeTruthy();
+      result = transitions(machine, [reset()], machine.initialState);
+      expect(result.matches('form.username.valid.valid')).toBeTruthy();
+    });
+    it('can be valid after invalid', () => {
+      const machineConfig = buildMachine();
+      const machine = Machine(machineConfig);
+      let result = transitions(
+        machine,
+        [focus('username'), change('username', '123'), invalid('username')],
+        machine.initialState
+      );
+      expect(result.matches('form.username.valid.invalid')).toBeTruthy();
+      result = transitions(machine, [valid('username')], machine.initialState);
+      expect(result.matches('form.username.valid.valid')).toBeTruthy();
+    });
+    it('ignores invalid when not touched', () => {
+      const machineConfig = buildMachine();
+      const machine = Machine(machineConfig);
+      let result = transitions(machine, [focus('username'), invalid('username')], machine.initialState);
+      expect(result.matches('form.username.valid.valid')).toBeTruthy();
     });
   });
 
@@ -162,51 +276,6 @@ describe('text', () => {
       expect(result.matches('form.username.focus.focused')).toBeTruthy();
       result = transitions(machine, [invisible('username')], result);
       expect(result.matches('form.username.focus.unfocused')).toBeTruthy();
-    });
-  });
-
-  describe('validation', () => {
-    it('is valid by default', () => {
-      const machineConfig = buildMachine();
-      const machine = Machine(machineConfig);
-      let result = transitions(machine, [focus('username')], machine.initialState);
-      expect(result.matches('form.username.valid.valid')).toBeTruthy();
-    });
-    it('is valid when changed', () => {
-      const machineConfig = buildMachine();
-      const machine = Machine(machineConfig);
-      let result = transitions(machine, [focus('username'), change('username', '123')], machine.initialState);
-      expect(result.matches('form.username.valid.valid')).toBeTruthy();
-    });
-    it('is valid on reset', () => {
-      const machineConfig = buildMachine();
-      const machine = Machine(machineConfig);
-      let result = transitions(
-        machine,
-        [focus('username'), change('username', '123'), invalid('username')],
-        machine.initialState
-      );
-      expect(result.matches('form.username.valid.invalid')).toBeTruthy();
-      result = transitions(machine, [reset()], machine.initialState);
-      expect(result.matches('form.username.valid.valid')).toBeTruthy();
-    });
-    it('can be valid after invalid', () => {
-      const machineConfig = buildMachine();
-      const machine = Machine(machineConfig);
-      let result = transitions(
-        machine,
-        [focus('username'), change('username', '123'), invalid('username')],
-        machine.initialState
-      );
-      expect(result.matches('form.username.valid.invalid')).toBeTruthy();
-      result = transitions(machine, [valid('username')], machine.initialState);
-      expect(result.matches('form.username.valid.valid')).toBeTruthy();
-    });
-    it('ignores invalid when not touched', () => {
-      const machineConfig = buildMachine();
-      const machine = Machine(machineConfig);
-      let result = transitions(machine, [focus('username'), invalid('username')], machine.initialState);
-      expect(result.matches('form.username.valid.valid')).toBeTruthy();
     });
   });
 

@@ -6,7 +6,7 @@ export const condIsEnabled = (name: string): any => (_c: any, _e: any, m: any) =
 export const condIsVisible = (name: string): any => (_c: any, _e: any, m: any) =>
   m.state.matches(`form.${name}.visible.visible`);
 
-export const condIsTouched = (name: string): any => (c: any, _e: any, _m: any) => c.touched[name] === true;
+// export const condIsTouched = (name: string): any => (c: any, _e: any, _m: any) => c.touched[name] === true;
 
 /**
  * Tests that a value is a true boolean

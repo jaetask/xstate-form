@@ -1,4 +1,6 @@
 import { assign } from 'xstate';
+import { raise } from 'xstate/lib/actions';
+import { invalid, valid } from './actions';
 
 export const value = (name: string): any =>
   assign({
@@ -7,17 +9,6 @@ export const value = (name: string): any =>
       return values;
     },
   });
-
-// const removeValue = (name: string): any =>
-//   assign({
-//     values: ({ values }: any) => {
-//       if (values[name]) {
-//         // todo: set back to default value (if there is one)...
-//         delete values[name];
-//       }
-//       return values;
-//     },
-//   });
 
 export const currentFocus = (name: string): any => assign({ focused: name });
 export const clearCurrentFocus = () => assign({ focused: null });
@@ -33,24 +24,6 @@ export const resetValue = (name: string): any =>
     },
   });
 
-export const touch = (name: string): any =>
-  assign({
-    touched: ({ touched }: any) => {
-      touched[name] = true;
-      return touched;
-    },
-  });
-
-export const untouch = (name: string): any =>
-  assign({
-    touched: ({ touched }: any) => {
-      if (touched[name]) {
-        delete touched[name];
-      }
-      return touched;
-    },
-  });
-
 export const validate = (name: string) =>
   assign({
     errors: (c: any, e: any, m: any) => {
@@ -61,6 +34,34 @@ export const validate = (name: string) =>
       return {};
     },
   });
+
+export const updateValidity = (name: string): any => {
+  // checks the previous invalid items
+  // if the current field is invalid and no longer in the
+  return (context: any, _e: any, meta: any): any => {
+    // move this to a condition!
+    const wasFieldInInvalidState = meta?.state?.value?.form[name]?.valid === 'invalid';
+    const doesFieldHaveError = context?.errors[name] === true;
+
+    console.log('updateValidity', name);
+    console.log('wasFieldInInvalidState', name, wasFieldInInvalidState);
+    console.log('doesFieldHaveError', doesFieldHaveError);
+
+    // if field was invalid but no longer is, raise('VALID')
+    if (wasFieldInInvalidState && !doesFieldHaveError) {
+      return raise(valid(name));
+    }
+
+    // if field was valid but no longer is, raise ('INVALID')
+    if (!wasFieldInInvalidState && doesFieldHaveError) {
+      return raise(invalid(name));
+    }
+    // console.log('c,e,m', context, e, meta);
+
+    // if field did have an still has an error, do nothing
+    return undefined;
+  };
+};
 
 export const resettingState = () => ({
   after: {
@@ -112,7 +113,7 @@ export const form = ({
       errors: {},
       focused: null,
       initialValues,
-      touched: {},
+      // touched: {},
       validate,
       values: { ...initialValues },
     },
