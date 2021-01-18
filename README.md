@@ -21,12 +21,12 @@ import { form, fields } from 'xstate-form';
 
 const machine = form({
   id: 'myAwesomeForm',
-  fields: {
-    username: fields.text('username'),
-    password: fields.text('password'),
+  fields: [
+    fields.text({ name: 'username' }),
+    fields.text({ name: 'password' }),
     // ...
-    submitForm: fields.submit('submitForm'),
-  },
+    fields.submit({ name: 'submitForm' }),
+  ],
   initialValues: {
     username: 'jaetask',
     password: 'ThisIsTheWay',
@@ -40,7 +40,7 @@ Here's an example of the `text` state node.
 _simplified for berevity_
 
 ```js
-const text = (name: string) => ({
+{
   id: name,
   type: 'parallel',
   states: {
@@ -86,6 +86,12 @@ _note: we don't currently use the `meta.field.type` but think this is a good ide
 
 ## Validation
 
+> Validation API currently in flux
+
+Currently loking at a way to make all fields self validate and post status back to parent. Fields as `Actors`
+
+---
+
 Form validation works via a simple JS function, (this enables any validation library, including `Yup` to be used by the user). There is a [ticket](https://github.com/jaetask/xstate-form/projects/1#card-52968847) to add Yup integration by default via `validationSchema`
 
 ```js
@@ -103,12 +109,12 @@ const machine = form({
     }
     return errors;
   },
-  fields: {
-    username: fields.text('username'),
-    password: fields.text('password'),
+  fields: [
+    fields.text({ name: 'username' }),
+    fields.text({ name: 'password' }),
     // ...
-    submitForm: fields.submit('submitForm'),
-  },
+    fields.submit({ name: 'submitForm' }),
+  ],
   initialValues: {
     username: 'jaetask',
     password: 'ThisIsTheWay',
