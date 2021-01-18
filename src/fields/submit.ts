@@ -2,7 +2,7 @@ import { condFieldName, condIsEnabled } from '../conditions';
 import { raise } from 'xstate/lib/actions';
 
 // submit is a particular type of button
-const submit = (name: string) => ({
+const submit = ({ name = '' }) => ({
   id: name,
   type: 'parallel',
   states: {

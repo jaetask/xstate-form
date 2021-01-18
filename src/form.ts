@@ -96,16 +96,34 @@ export const submittedState = () => ({
  * invoke service (or whatever). All forms will need initialValues, touched, errors, values and
  * schema context items.
  */
+
+// Thisis actually an XSateNode
+
+interface LooseObject {
+  [id: string]: any;
+}
+
+export interface FormParams {
+  id: string;
+  fields: LooseObject[];
+  initialValues?: LooseObject;
+  additionalStates?: {};
+  resetting?: {};
+  submitting?: {};
+  submitted?: {};
+  validate?: undefined;
+}
+
 export const form = ({
-  fields = {},
-  id = 'xstateForm',
-  initialValues = {},
-  additionalStates = {}, // enable users to expand the states for things like RETRY!
+  id,
+  initialValues,
   resetting = resettingState(),
   submitting = submittingState(),
-  submitted = submittedState(),
-  validate = undefined,
-}): any => {
+  submitted = submittingState(),
+  additionalStates,
+  fields,
+}: FormParams): any => {
+  var obj: LooseObject = {};
   return {
     id,
     initial: 'form',
@@ -118,6 +136,11 @@ export const form = ({
       values: { ...initialValues },
     },
     states: {
+      // does having this state affect the form fields RESET ability?
+      resetting,
+      submitting,
+      submitted,
+      ...additionalStates,
       // todo: Does this support nesting? tabbed forms etc? Can fields be grouped? i.e. radios?
       // considering all fields in a mutli page form are still in one form, we just choose to
       // show/hide parts of the form per page.
@@ -130,18 +153,17 @@ export const form = ({
             type: 'history',
             history: 'deep',
           },
-          ...fields,
+          // convert field map into keyed:object
+          ...fields.reduce((c, e: LooseObject): any => {
+            c[e.id] = e;
+            return c;
+          }, obj),
         },
         on: {
           SUBMIT: 'submitting',
           RESET: 'resetting',
         },
       },
-      // does having this state affect the form fields RESET ability?
-      resetting,
-      submitting,
-      submitted,
-      ...additionalStates,
     },
   };
 };

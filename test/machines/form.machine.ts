@@ -15,12 +15,13 @@ import { form } from '../../src/form';
 
 export const buildMachine = (): any => {
   return form({
-    fields: {
-      username: text('username'), //todo, provide method to extend field actions
-      password: text('password'),
+    id: 'myTestForm',
+    fields: [
+      text({ name: 'username' }),
+      text({ name: 'password' }),
       // ...
-      submitForm: submit('submitForm'),
-    },
+      submit({ name: 'submitForm' }),
+    ],
     initialValues: {
       username: 'jaetask',
     },

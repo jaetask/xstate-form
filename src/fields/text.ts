@@ -2,7 +2,7 @@ import { condFieldName, condIsEnabled, condIsVisible, conditionsAll } from '../c
 import { clearCurrentFocus, currentFocus, resetValue, validate, value } from '../form';
 
 // todo, change to an object of params for labels, initialValue etc
-const text = (name: string) => ({
+const text = ({ name = '' }): any => ({
   id: name,
   type: 'parallel',
   // let's not get into field level context yet, but we will once moving to the actos model in full
@@ -12,22 +12,21 @@ const text = (name: string) => ({
     somePrivateTextFieldContext: 'value',
   },
   states: {
-    enable: {
-      initial: 'enabled',
+    touch: {
+      initial: 'untouched',
       states: {
-        enabled: {
+        untouched: {
           on: {
-            DISABLE: {
-              target: ['disabled', `#${name}.focus.unfocused`],
+            BLUR: {
+              target: 'touched',
               cond: condFieldName(name),
             },
           },
         },
-        disabled: {
+        touched: {
           on: {
-            ENABLE: {
-              target: 'enabled',
-              cond: condFieldName(name),
+            RESET: {
+              target: 'untouched',
             },
           },
         },
@@ -71,46 +70,49 @@ const text = (name: string) => ({
         },
       },
     },
-    pristine: {
-      initial: 'pristine',
+    enable: {
+      initial: 'enabled',
       states: {
-        pristine: {
+        enabled: {
           on: {
-            CHANGE: {
-              target: 'dirty',
+            DISABLE: {
+              target: ['disabled', `#${name}.focus.unfocused`],
               cond: condFieldName(name),
             },
           },
         },
-        dirty: {
+        disabled: {
           on: {
-            RESET: {
-              target: 'pristine',
+            ENABLE: {
+              target: 'enabled',
+              cond: condFieldName(name),
             },
           },
         },
       },
     },
-    touch: {
-      initial: 'untouched',
+    visible: {
+      initial: 'visible',
       states: {
-        untouched: {
+        visible: {
           on: {
-            BLUR: {
-              target: 'touched',
+            INVISIBLE: {
+              target: ['invisible', `#${name}.focus.unfocused`],
               cond: condFieldName(name),
             },
           },
         },
-        touched: {
+        invisible: {
           on: {
-            RESET: {
-              target: 'untouched',
+            VISIBLE: {
+              target: 'visible',
+              cond: condFieldName(name),
             },
           },
         },
       },
     },
+
     valid: {
       initial: 'valid',
       states: {
@@ -138,22 +140,21 @@ const text = (name: string) => ({
         },
       },
     },
-    visible: {
-      initial: 'visible',
+    pristine: {
+      initial: 'pristine',
       states: {
-        visible: {
+        pristine: {
           on: {
-            INVISIBLE: {
-              target: ['invisible', `#${name}.focus.unfocused`],
+            CHANGE: {
+              target: 'dirty',
               cond: condFieldName(name),
             },
           },
         },
-        invisible: {
+        dirty: {
           on: {
-            VISIBLE: {
-              target: 'visible',
-              cond: condFieldName(name),
+            RESET: {
+              target: 'pristine',
             },
           },
         },
@@ -163,7 +164,7 @@ const text = (name: string) => ({
   meta: {
     field: {
       type: 'text',
-      // todo: fill this from the forms intiial values, is used to detect pristine/dirty
+      // todo: fill this from the forms intiial values, will be used to detect pristine/dirty
       initialValue: '',
     },
   },
