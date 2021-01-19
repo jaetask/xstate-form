@@ -24,17 +24,6 @@ export const resetValue = (name: string): any =>
     },
   });
 
-export const validate = (name: string) =>
-  assign({
-    errors: (c: any, e: any, m: any) => {
-      // if we have a validate function, call it and we're good to go
-      if (typeof c?.validate === 'function') {
-        return c.validate(c.values, e, m, name);
-      }
-      return {};
-    },
-  });
-
 export const updateValidity = (name: string): any => {
   // checks the previous invalid items
   // if the current field is invalid and no longer in the
@@ -131,8 +120,6 @@ export const form = ({
       errors: {},
       focused: null,
       initialValues,
-      // touched: {},
-      validate,
       values: { ...initialValues },
     },
     states: {

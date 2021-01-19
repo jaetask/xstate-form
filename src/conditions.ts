@@ -1,7 +1,10 @@
 export const condFieldName = (name: string): any => (_: any, e: any) => e.fieldName === name;
 
-export const condIsEnabled = (name: string): any => (_c: any, _e: any, m: any) =>
-  m.state.matches(`form.${name}.enable.enabled`);
+export const condIsEnabled = (name: string): any => (_c: any, _e: any, m: any) => {
+  // console.log('condIsEnabled', c, e, m);
+
+  return m.state.matches(`form.${name}.enable.enabled`);
+};
 
 export const condIsVisible = (name: string): any => (_c: any, _e: any, m: any) =>
   m.state.matches(`form.${name}.visible.visible`);

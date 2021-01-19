@@ -1,15 +1,20 @@
-import { condFieldName, condIsEnabled, condIsVisible, conditionsAll } from '../conditions';
-import { clearCurrentFocus, currentFocus, resetValue, validate, value } from '../form';
+import { assign, sendParent } from 'xstate';
+import { condFieldName, conditionsAll } from '../conditions';
+import { clearCurrentFocus, resetValue } from '../form';
 
 // todo, change to an object of params for labels, initialValue etc
-const text = ({ name = '' }): any => ({
+interface TextField {
+  name: string;
+  validator?: any | null;
+}
+
+const text = ({ name = '', validator = null }: TextField): any => ({
   id: name,
   type: 'parallel',
-  // let's not get into field level context yet, but we will once moving to the actos model in full
-  // the fileds will be self sustaining machines with their own private context and requests will be made for them
-  // to validate, get values etc.
   context: {
-    somePrivateTextFieldContext: 'value',
+    value: 'jaetask', // fields values are private
+    validator,
+    errors: {},
   },
   states: {
     touch: {
@@ -38,17 +43,19 @@ const text = ({ name = '' }): any => ({
         focused: {
           on: {
             BLUR: {
-              target: ['unfocused', `#${name}.touch.touched`],
-              actions: [validate(name), clearCurrentFocus()],
+              target: 'unfocused',
               cond: condFieldName(name),
             },
             CHANGE: {
-              actions: [value(name), validate(name)],
-              cond: conditionsAll([condFieldName(name), condIsEnabled(name)]),
+              actions: [
+                assign({
+                  value: (_: any, e: any) => e.value,
+                }),
+              ],
+              cond: conditionsAll([condFieldName(name)]),
             },
             FOCUS: {
               target: 'unfocused',
-              actions: currentFocus(name),
               cond: !condFieldName(name),
             },
           },
@@ -57,16 +64,15 @@ const text = ({ name = '' }): any => ({
           on: {
             FOCUS: {
               target: 'focused',
-              actions: currentFocus(name),
-              cond: conditionsAll([condFieldName(name), condIsEnabled(name), condIsVisible(name)]),
+              cond: conditionsAll([condFieldName(name)]),
             },
           },
         },
       },
       on: {
         RESET: {
-          target: ['focus.unfocused', `#${name}.touch.untouched`],
-          actions: [resetValue(name), validate(name), clearCurrentFocus()],
+          target: 'focus.unfocused',
+          actions: [resetValue(name), clearCurrentFocus()],
         },
       },
     },
@@ -112,11 +118,11 @@ const text = ({ name = '' }): any => ({
         },
       },
     },
-
     valid: {
       initial: 'valid',
       states: {
         valid: {
+          entry: assign({ errors: {} }),
           on: {
             INVALID: {
               target: 'invalid',
@@ -125,6 +131,7 @@ const text = ({ name = '' }): any => ({
           },
         },
         invalid: {
+          entry: assign({ errors: (_, e: any) => e.errors }),
           on: {
             VALID: {
               target: 'valid',
@@ -158,6 +165,38 @@ const text = ({ name = '' }): any => ({
             },
           },
         },
+      },
+    },
+    validator: {
+      initial: 'idle',
+      states: {
+        idle: {},
+        validating: {
+          invoke: {
+            id: `${name}Validator`,
+            src: (context: any, event: any) => async (callback: any) => {
+              if (validator) {
+                const errors = await validator(context, event);
+                if (Object.keys(errors).length) {
+                  callback({ type: 'INVALID', fieldName: name, errors });
+                  callback({ type: 'VALIDATION_RESULT', fieldName: name, errors });
+                  return;
+                }
+              }
+              callback({ type: 'VALID', fieldName: name, errors: {} });
+              callback({ type: 'VALIDATION_RESULT', fieldName: name, errors: {} });
+            },
+          },
+          on: {
+            VALIDATION_RESULT: {
+              target: 'idle',
+              actions: sendParent((_c: any, e: any) => e),
+            },
+          },
+        },
+      },
+      on: {
+        VALIDATE: '.validating',
       },
     },
   },
